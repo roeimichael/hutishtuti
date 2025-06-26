@@ -3,6 +3,18 @@ from .core.deck import Deck
 from .core.card import Card
 from .player import Player
 from .core.hand_evaluator import HandEvaluator
+import os
+from datetime import datetime
+
+try:
+    import pyautogui
+except ImportError:
+    pyautogui = None
+
+try:
+    from ocr_reader import detect_hand_from_image
+except ImportError:
+    detect_hand_from_image = None
 
 class Game:
     def __init__(self, small_blind: int = 5, big_blind: int = 10):
@@ -98,3 +110,26 @@ class Game:
         # TODO: Implement hand comparison logic
         # This will use HandEvaluator to compare hands and determine winners
         return [] 
+
+    def detect_hand_from_screen(self):
+        """
+        Takes a screenshot, saves it to the images folder, runs OCR, and prints the detected hand.
+        """
+        if pyautogui is None:
+            print("pyautogui is not installed. Please install it to use screenshot functionality.")
+            return
+        if detect_hand_from_image is None:
+            print("detect_hand_from_image could not be imported from ocr_reader.py.")
+            return
+        images_dir = os.path.join(os.path.dirname(os.path.dirname(__file__)), '..', 'images')
+        os.makedirs(images_dir, exist_ok=True)
+        timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
+        screenshot_path = os.path.join(images_dir, f'screenshot_{timestamp}.png')
+        screenshot = pyautogui.screenshot()
+        screenshot.save(screenshot_path)
+        print(f"Screenshot saved to {screenshot_path}")
+        try:
+            hand = detect_hand_from_image(screenshot_path)
+            print("Detected hand:", hand)
+        except Exception as e:
+            print("Error running OCR:", e) 
