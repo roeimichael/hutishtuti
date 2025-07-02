@@ -1,8 +1,7 @@
-from typing import List, Dict
-from .core.deck import Deck
+from typing import List, Union
+from .player import MePlayer, EnemyPlayer, PlayerBase
+from .table import Table
 from .core.card import Card
-from .player import Player
-from .core.hand_evaluator import HandEvaluator
 import os
 from datetime import datetime
 
@@ -17,99 +16,101 @@ except ImportError:
     detect_hand_from_image = None
 
 class Game:
-    def __init__(self, small_blind: int = 5, big_blind: int = 10):
-        self.players: List[Player] = []
-        self.deck = Deck()
-        self.community_cards: List[Card] = []
-        self.pot = 0
-        self.small_blind = small_blind
-        self.big_blind = big_blind
-        self.current_bet = 0
-        self.dealer_position = 0
-        self.current_player_position = 0
-        self.round = 0  # 0: Pre-flop, 1: Flop, 2: Turn, 3: River
+    def __init__(self):
+        self.players: List[PlayerBase] = []  # MePlayer and EnemyPlayer objects
+        self.betting_round: str = 'preflop'  # 'preflop', 'flop', 'turn', 'river'
+        self.table = Table()
+        self.dealer_position: int = 0  # Add dealer position tracking
 
-    def add_player(self, player: Player) -> None:
-        """Add a player to the game."""
+    def add_player(self, player: PlayerBase) -> None:
         self.players.append(player)
+        self.table.active_players = self.get_active_players()
 
-    def start_new_hand(self) -> None:
-        """Start a new hand of poker."""
-        self.deck.reset()
-        self.community_cards = []
-        self.pot = 0
-        self.current_bet = 0
-        self.round = 0
-        
-        # Reset player states
+    def remove_player(self, player_id: str) -> None:
+        self.players = [p for p in self.players if not (hasattr(p, 'player_id') and getattr(p, 'player_id') == player_id)]
+        self.table.active_players = self.get_active_players()
+
+    def get_active_players(self) -> int:
+        return sum(1 for p in self.players if getattr(p, 'is_active', True))
+
+    def update_me_relative_position(self):
+        # Find MePlayer
+        me = next((p for p in self.players if p.__class__.__name__ == 'MePlayer'), None)
+        if not me:
+            return
+        # Get all active players in table order
+        active_players = [p for p in self.players if getattr(p, 'is_active', True)]
+        num_players = len(active_players)
+        if num_players == 0:
+            me.set_relative_position(None)
+            return
+        # Find MePlayer's index among active players
+        me_index = active_players.index(me)
+        # Relative position: how many act before me, starting after dealer
+        rel_pos = (me_index - self.dealer_position) % num_players
+        me.set_relative_position(rel_pos)
+
+    def start_new_hand(self):
+        self.table.reset_for_new_hand()
         for player in self.players:
-            player.reset_for_new_hand()
-        
-        # Deal hole cards
-        self._deal_hole_cards()
-        
-        # Post blinds
-        self._post_blinds()
+            if hasattr(player, 'reset_for_new_hand'):
+                player.reset_for_new_hand()
+        self.betting_round = 'preflop'
+        self.table.active_players = self.get_active_players()
+        self.update_me_relative_position()
 
-    def _deal_hole_cards(self) -> None:
-        """Deal hole cards to all players."""
-        for player in self.players:
-            player.receive_cards(self.deck.deal(4))  # 4 cards for Omaha
-
-    def _post_blinds(self) -> None:
-        """Post small and big blinds."""
-        small_blind_pos = (self.dealer_position + 1) % len(self.players)
-        big_blind_pos = (self.dealer_position + 2) % len(self.players)
-        
-        self.players[small_blind_pos].place_bet(self.small_blind)
-        self.players[big_blind_pos].place_bet(self.big_blind)
-        
-        self.current_bet = self.big_blind
-        self.current_player_position = (big_blind_pos + 1) % len(self.players)
-
-    def deal_community_cards(self) -> None:
-        """Deal the next set of community cards."""
-        if self.round == 0:  # Flop
-            self.community_cards.extend(self.deck.deal(3))
-        elif self.round in [1, 2]:  # Turn and River
-            self.community_cards.extend(self.deck.deal(1))
-        self.round += 1
-
-    def process_player_action(self, player: Player, action: str, amount: int = 0) -> bool:
-        """
-        Process a player's action (fold, check, call, raise).
-        Returns True if the action was valid, False otherwise.
-        """
-        if not player.is_active:
+    def process_player_action(self, player_id: str, action: str, amount: float = 0.0):
+        player = next((p for p in self.players if getattr(p, 'player_id', None) == player_id or isinstance(p, MePlayer)), None)
+        if not player:
+            print(f"Player {player_id} not found.")
             return False
-
-        if action == "fold":
-            player.fold()
-        elif action == "check":
-            if self.current_bet > player.current_bet:
+        if not getattr(player, 'is_active', True):
+            print(f"Player {player_id} is not active.")
+            return False
+        # Only MePlayer has action methods
+        if isinstance(player, MePlayer):
+            if action == 'all-in':
+                player.all_in()
+                self.table.add_to_pot(player.bet_amount)
+            elif action == 'bet':
+                if player.bet(amount):
+                    self.table.add_to_pot(amount)
+            elif action == 'fold':
+                player.fold()
+            elif action == 'call':
+                if player.call(amount):
+                    self.table.add_to_pot(amount)
+            elif action == 'check':
+                player.check()
+            else:
+                print(f"Unknown action: {action}")
                 return False
-        elif action == "call":
-            call_amount = self.current_bet - player.current_bet
-            if not player.place_bet(call_amount):
+        else:
+            # For EnemyPlayer, just update is_active and history
+            if action == 'fold':
+                player.is_active = False
+                player.last_action = 'fold'
+                player.history.append(('fold', None))
+            elif action in ['bet', 'call', 'all-in']:
+                player.last_action = action
+                player.history.append((action, amount))
+                self.table.add_to_pot(amount)
+            elif action == 'check':
+                player.last_action = 'check'
+                player.history.append(('check', None))
+            else:
+                print(f"Unknown action: {action}")
                 return False
-        elif action == "raise":
-            if amount <= self.current_bet:
-                return False
-            if not player.place_bet(amount - player.current_bet):
-                return False
-            self.current_bet = amount
-
+        self.table.active_players = self.get_active_players()
         return True
 
-    def determine_winner(self) -> List[Player]:
-        """Determine the winner(s) of the current hand."""
-        active_players = [p for p in self.players if p.is_active]
-        if len(active_players) == 1:
-            return active_players
+    def set_betting_round(self, round_name: str):
+        if round_name in ['preflop', 'flop', 'turn', 'river']:
+            self.betting_round = round_name
 
-        # TODO: Implement hand comparison logic
-        # This will use HandEvaluator to compare hands and determine winners
-        return [] 
+    def __str__(self):
+        players_str = '\n'.join(str(p) for p in self.players)
+        return f"Game State:\nBetting Round: {self.betting_round}\n{self.table}\nPlayers:\n{players_str}"
 
     def detect_hand_from_screen(self):
         """
