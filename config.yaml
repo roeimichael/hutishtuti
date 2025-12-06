@@ -1,0 +1,69 @@
+# Hutishtuti OCR Configuration File
+# Copy this file to config.local.yaml and customize for your setup
+
+# Path to Tesseract OCR executable
+# Windows example: C:\Users\username\Desktop\tesseract\tesseract.exe
+# Linux example: /usr/bin/tesseract
+# macOS example: /usr/local/bin/tesseract
+tesseract:
+  path: "C:\\Users\\roeym\\Desktop\\tesseract\\tesseract.exe"
+
+# Card locations on screen (left, top, right, bottom)
+# These coordinates define where cards appear in your poker client
+# Adjust these based on your screen resolution and poker client layout
+card_locations:
+  card1: [880, 770, 915, 810]    # Left hand card
+  card2: [945, 770, 985, 810]    # Right hand card
+  flop1: [592, 320, 652, 400]    # Flop card 1
+  flop2: [662, 320, 722, 400]    # Flop card 2
+  flop3: [732, 320, 792, 400]    # Flop card 3
+  turn:  [802, 320, 862, 400]    # Turn card
+  river: [872, 320, 932, 400]    # River card
+
+# RGB color values for each suit (used for color-based suit detection)
+# Format: [R, G, B] where each value is 0-255
+suit_colors:
+  hearts:   [150, 33, 24]
+  diamonds: [29, 70, 149]
+  spades:   [0, 0, 0]
+  clubs:    [59, 103, 24]
+
+# Suit abbreviations
+suit_initials:
+  hearts: "H"
+  diamonds: "D"
+  spades: "S"
+  clubs: "C"
+
+# OCR preprocessing settings
+ocr:
+  # Threshold for binarization (0-255)
+  threshold: 180
+  # Padding around card image for better OCR
+  padding: 30
+  # Output size for processed images
+  output_size: [100, 100]
+  # Tesseract PSM mode (10 = single character)
+  psm_mode: 10
+  # Directory to save card crops
+  crop_directory: "card_crops"
+
+# Card text replacements for OCR corrections
+# Maps common OCR errors to correct values
+card_replacements:
+  "J": "J"
+  "Q": "Q"
+  "K": "K"
+  "A": "A"
+  "0": "10"
+  "O": "10"
+  "o": "10"
+  "1": "1"
+  "2": "2"
+  "3": "3"
+  "4": "4"
+  "5": "5"
+  "6": "6"
+  "7": "7"
+  "8": "8"
+  "9": "9"

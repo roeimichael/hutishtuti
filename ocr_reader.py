@@ -1,38 +1,20 @@
 import os
 import pytesseract
-pytesseract.pytesseract.tesseract_cmd = r"C:\Users\roeym\Desktop\tesseract\tesseract.exe"
 from PIL import Image, ImageOps
 import numpy as np
+from src.config import get_config
 
-CARD_LOCATIONS = {
-    'card1': (880, 770, 915, 810),  # Left hand card
-    'card2': (945, 770, 985, 810),   #  right hand card 2
-    'flop1': (592, 320, 652, 400),   # Flop 1
-    'flop2': (662, 320, 722, 400),   # Flop 2
-    'flop3': (732, 320, 792, 400),   # Flop 3
-    'turn':  (802, 320, 862, 400),   # Turn
-    'river': (872, 320, 932, 400),   # River
-}
+# Load configuration
+config = get_config()
 
-SHAPE_COLORS = {
-    "hearts": (150, 33, 24),
-    "diamonds": (29, 70, 149),
-    "spades": (0, 0, 0),
-    "clubs": (59, 103, 24),
-}
+# Set Tesseract path from config
+pytesseract.pytesseract.tesseract_cmd = config.tesseract_path
 
-SUIT_INITIALS = {
-    "hearts": "H",
-    "diamonds": "D",
-    "spades": "S",
-    "clubs": "C",
-}
-
-CARD_REPLACEMENTS = {
-    'J': 'J', 'Q': 'Q', 'K': 'K', 'A': 'A',
-    '0': '10', 'O': '10', 'o': '10',
-    '1': '1', '2': '2', '3': '3', '4': '4', '5': '5', '6': '6', '7': '7', '8': '8', '9': '9'
-}
+# Load all configuration values
+CARD_LOCATIONS = config.card_locations
+SHAPE_COLORS = config.suit_colors
+SUIT_INITIALS = config.suit_initials
+CARD_REPLACEMENTS = config.card_replacements
 
 def closest_shape(color):
     min_dist = float('inf')
@@ -55,11 +37,17 @@ def sample_shape_color(card_img):
     print(f"Sampled color for card: {color}")
     return color
 
-def preprocess_card(card_img, out_size=(100, 100), pad=30):
+def preprocess_card(card_img, out_size=None, pad=None):
+    # Use config defaults if not provided
+    if out_size is None:
+        out_size = config.ocr_output_size
+    if pad is None:
+        pad = config.ocr_padding
+
     # Convert to grayscale
     card_img = card_img.convert("L")
     # Binarize (black and white)
-    threshold = 180
+    threshold = config.ocr_threshold
     card_img = card_img.point(lambda x: 0 if x < threshold else 255, '1')
     # Pad with white background
     w, h = card_img.size
@@ -68,7 +56,11 @@ def preprocess_card(card_img, out_size=(100, 100), pad=30):
     background.paste(card_img, (pad, pad))
     return background
 
-def process_card_from_image(img, card_name, coords, crop_dir="card_crops"):
+def process_card_from_image(img, card_name, coords, crop_dir=None):
+    # Use config default if not provided
+    if crop_dir is None:
+        crop_dir = config.crop_directory
+
     os.makedirs(crop_dir, exist_ok=True)
     card_crop = img.crop(coords)
     capture_path = os.path.join(crop_dir, f"{card_name}_capture.png")
@@ -80,7 +72,10 @@ def process_card_from_image(img, card_name, coords, crop_dir="card_crops"):
     processed_path = os.path.join(crop_dir, f"{card_name}_processed.png")
     processed_img.save(processed_path)
     print(f"[{card_name.upper()}] Saved crop: {capture_path}, processed: {processed_path}")
-    text = pytesseract.image_to_string(processed_img, config='--psm 10').strip().upper()
+
+    # Use PSM mode from config
+    psm_config = f'--psm {config.ocr_psm_mode}'
+    text = pytesseract.image_to_string(processed_img, config=psm_config).strip().upper()
     text = CARD_REPLACEMENTS.get(text, text)
     return {'number': text, 'shape': shape, 'capture': capture_path, 'processed': processed_path}
 

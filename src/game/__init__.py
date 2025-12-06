@@ -1,7 +1,6 @@
 from .game import Game
-from .player import Player
+from .player import PlayerBase, MePlayer, EnemyPlayer
 from .core.card import Card, Suit, Rank
-from .core.deck import Deck
 from .core.hand_evaluator import HandEvaluator
 
-__all__ = ['Game', 'Player', 'Card', 'Suit', 'Rank', 'Deck', 'HandEvaluator'] 
+__all__ = ['Game', 'PlayerBase', 'MePlayer', 'EnemyPlayer', 'Card', 'Suit', 'Rank', 'HandEvaluator'] 
