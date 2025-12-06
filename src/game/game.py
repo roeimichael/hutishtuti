@@ -11,9 +11,19 @@ except ImportError:
     pyautogui = None
 
 try:
-    from ocr_reader import detect_hand_from_image
+    from ocr_reader import (
+        detect_hand_from_image,
+        read_flop_from_image,
+        read_turn_from_image,
+        read_river_from_image
+    )
+    OCR_AVAILABLE = True
 except ImportError:
     detect_hand_from_image = None
+    read_flop_from_image = None
+    read_turn_from_image = None
+    read_river_from_image = None
+    OCR_AVAILABLE = False
 
 class Game:
     def __init__(self):
@@ -114,23 +124,63 @@ class Game:
 
     def detect_hand_from_screen(self):
         """
-        Takes a screenshot, saves it to the images folder, runs OCR, and prints the detected hand.
+        Takes a screenshot, saves it to the images folder, runs OCR based on betting round.
+        - Preflop: Detects player's hand cards
+        - Flop: Detects flop cards and player's hand
+        - Turn: Detects turn card
+        - River: Detects river card
         """
         if pyautogui is None:
             print("pyautogui is not installed. Please install it to use screenshot functionality.")
             return
-        if detect_hand_from_image is None:
-            print("detect_hand_from_image could not be imported from ocr_reader.py.")
+        if not OCR_AVAILABLE:
+            print("OCR reader could not be imported from ocr_reader.py.")
             return
+
+        # Create images directory
         images_dir = os.path.join(os.path.dirname(os.path.dirname(__file__)), '..', 'images')
         os.makedirs(images_dir, exist_ok=True)
+
+        # Take screenshot
         timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
-        screenshot_path = os.path.join(images_dir, f'screenshot_{timestamp}.png')
+        screenshot_path = os.path.join(images_dir, f'screenshot_{self.betting_round}_{timestamp}.png')
         screenshot = pyautogui.screenshot()
         screenshot.save(screenshot_path)
         print(f"Screenshot saved to {screenshot_path}")
+
         try:
-            hand = detect_hand_from_image(screenshot_path)
-            print("Detected hand:", hand)
+            # Detect based on betting round
+            if self.betting_round == 'preflop':
+                hand = detect_hand_from_image(screenshot_path)
+                print(f"[PREFLOP] Detected hand: {hand}")
+                # Update player's cards if possible
+                me_player = next((p for p in self.players if isinstance(p, MePlayer)), None)
+                if me_player and len(hand) == 2:
+                    # Note: We'd need to convert the OCR output to Card objects
+                    print(f"Player hand detected: {hand}")
+
+            elif self.betting_round == 'flop':
+                # Detect both hand and flop
+                hand = detect_hand_from_image(screenshot_path)
+                print(f"[FLOP] Detected hand: {hand}")
+
+                flop = read_flop_from_image(screenshot_path)
+                print(f"[FLOP] Detected flop cards: {flop}")
+                # Update table community cards if needed
+
+            elif self.betting_round == 'turn':
+                turn = read_turn_from_image(screenshot_path)
+                print(f"[TURN] Detected turn card: {turn}")
+                # Update table with turn card if needed
+
+            elif self.betting_round == 'river':
+                river = read_river_from_image(screenshot_path)
+                print(f"[RIVER] Detected river card: {river}")
+                # Update table with river card if needed
+            else:
+                print(f"Unknown betting round: {self.betting_round}")
+
         except Exception as e:
-            print("Error running OCR:", e) 
+            import traceback
+            print(f"Error running OCR for {self.betting_round}:", e)
+            traceback.print_exc() 

@@ -80,39 +80,47 @@ def process_card_from_image(img, card_name, coords, crop_dir=None):
     return {'number': text, 'shape': shape, 'capture': capture_path, 'processed': processed_path}
 
 def detect_hand_from_image(image_path):
+    print(f"\n[DETECT HAND] Processing image: {image_path}")
     img = Image.open(image_path)
     hand_cards = []
     for card_name in ['card1', 'card2']:
+        print(f"[DETECT HAND] Processing {card_name} at location {CARD_LOCATIONS[card_name]}")
         card_info = process_card_from_image(img, card_name, CARD_LOCATIONS[card_name])
         hand_cards.append(card_info)
     card_strs = [f"{c['number']}-{SUIT_INITIALS.get(c['shape'], '?')}" for c in hand_cards]
     hand_str = f"({','.join(card_strs)})"
-    print(f"Hand: {hand_str}")
+    print(f"[DETECT HAND] Final Hand: {hand_str}")
     return hand_cards
 
 def read_flop_from_image(image_path):
+    print(f"\n[READ FLOP] Processing image: {image_path}")
     img = Image.open(image_path)
     flop_cards = []
     for card_name in ['flop1', 'flop2', 'flop3']:
+        print(f"[READ FLOP] Processing {card_name} at location {CARD_LOCATIONS[card_name]}")
         card_info = process_card_from_image(img, card_name, CARD_LOCATIONS[card_name])
         flop_cards.append(card_info)
     card_strs = [f"{c['number']}-{SUIT_INITIALS.get(c['shape'], '?')}" for c in flop_cards]
     flop_str = f"Flop: {','.join(card_strs)}"
-    print(flop_str)
+    print(f"[READ FLOP] Final Flop: {flop_str}")
     return flop_cards
 
 def read_turn_from_image(image_path):
+    print(f"\n[READ TURN] Processing image: {image_path}")
+    print(f"[READ TURN] Processing turn at location {CARD_LOCATIONS['turn']}")
     img = Image.open(image_path)
     card_info = process_card_from_image(img, 'turn', CARD_LOCATIONS['turn'])
     turn_str = f"Turn: {card_info['number']}-{SUIT_INITIALS.get(card_info['shape'], '?')}"
-    print(turn_str)
+    print(f"[READ TURN] Final Turn: {turn_str}")
     return card_info
 
 def read_river_from_image(image_path):
+    print(f"\n[READ RIVER] Processing image: {image_path}")
+    print(f"[READ RIVER] Processing river at location {CARD_LOCATIONS['river']}")
     img = Image.open(image_path)
     card_info = process_card_from_image(img, 'river', CARD_LOCATIONS['river'])
     river_str = f"River: {card_info['number']}-{SUIT_INITIALS.get(card_info['shape'], '?')}"
-    print(river_str)
+    print(f"[READ RIVER] Final River: {river_str}")
     return card_info
 
 if __name__ == "__main__":
