@@ -18,7 +18,6 @@ def main():
         # Set the betting round
         game.set_betting_round(round_name)
         input(f"\n--- {display_name} ---\nPress Enter to capture cards...")
-        print(f"Capturing for betting round: {round_name}")
         game.detect_hand_from_screen()
 
     print("\nGame phase analysis complete.")

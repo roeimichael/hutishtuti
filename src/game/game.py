@@ -146,37 +146,27 @@ class Game:
         screenshot_path = os.path.join(images_dir, f'screenshot_{self.betting_round}_{timestamp}.png')
         screenshot = pyautogui.screenshot()
         screenshot.save(screenshot_path)
-        print(f"Screenshot saved to {screenshot_path}")
 
         try:
             # Detect based on betting round
             if self.betting_round == 'preflop':
-                hand = detect_hand_from_image(screenshot_path)
-                print(f"[PREFLOP] Detected hand: {hand}")
-                # Update player's cards if possible
-                me_player = next((p for p in self.players if isinstance(p, MePlayer)), None)
-                if me_player and len(hand) == 2:
-                    # Note: We'd need to convert the OCR output to Card objects
-                    print(f"Player hand detected: {hand}")
+                hand, hand_str = detect_hand_from_image(screenshot_path)
+                print(f"  Your hand: {hand_str}")
 
             elif self.betting_round == 'flop':
                 # Detect both hand and flop
-                hand = detect_hand_from_image(screenshot_path)
-                print(f"[FLOP] Detected hand: {hand}")
-
-                flop = read_flop_from_image(screenshot_path)
-                print(f"[FLOP] Detected flop cards: {flop}")
-                # Update table community cards if needed
+                hand, hand_str = detect_hand_from_image(screenshot_path)
+                flop, flop_str = read_flop_from_image(screenshot_path)
+                print(f"  Your hand: {hand_str}")
+                print(f"  Flop: {flop_str}")
 
             elif self.betting_round == 'turn':
-                turn = read_turn_from_image(screenshot_path)
-                print(f"[TURN] Detected turn card: {turn}")
-                # Update table with turn card if needed
+                turn, turn_str = read_turn_from_image(screenshot_path)
+                print(f"  Turn: {turn_str}")
 
             elif self.betting_round == 'river':
-                river = read_river_from_image(screenshot_path)
-                print(f"[RIVER] Detected river card: {river}")
-                # Update table with river card if needed
+                river, river_str = read_river_from_image(screenshot_path)
+                print(f"  River: {river_str}")
             else:
                 print(f"Unknown betting round: {self.betting_round}")
 
