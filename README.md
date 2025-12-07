@@ -91,11 +91,26 @@ Enter coordinates manually. See [CALIBRATION_GUIDE.md](CALIBRATION_GUIDE.md) for
 
 ### Running the OCR Analyzer
 
+#### Option 1: GUI Mode (Recommended)
+
+```bash
+python run_game_gui.py
+```
+
+The GUI provides:
+- Visual interface showing current phase
+- "Capture Cards" button to take screenshot and detect cards
+- Real-time display of detected cards (hand, flop, turn, river)
+- Automatic phase progression
+- Reset button to start over
+
+#### Option 2: Terminal Mode
+
 ```bash
 python run_game.py
 ```
 
-The analyzer will:
+The terminal analyzer will:
 1. Wait for you to press Enter at each poker phase
 2. Capture a screenshot of your poker table
 3. Detect cards using OCR based on the current phase:
@@ -151,7 +166,8 @@ Key configuration options:
 hutishtuti/
 ├── config.yaml              # Default configuration
 ├── ocr_reader.py           # OCR card detection functions
-├── run_game.py             # Main entry point
+├── run_game_gui.py         # GUI entry point (recommended)
+├── run_game.py             # Terminal entry point
 ├── calibrate_positions.py  # Manual calibration tool
 ├── calibrate_positions_visual.py  # Visual calibration tool
 ├── CALIBRATION_GUIDE.md    # Detailed calibration instructions
