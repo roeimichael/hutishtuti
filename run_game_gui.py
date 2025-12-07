@@ -15,7 +15,7 @@ class PokerOCRGui:
     def __init__(self):
         self.window = tk.Tk()
         self.window.title("Poker OCR Analyzer")
-        self.window.geometry("650x500")
+        self.window.geometry("700x600")
         self.window.resizable(False, False)
 
         self.game = Game()
@@ -72,14 +72,14 @@ class PokerOCRGui:
         self.hand_label = ttk.Label(
             hand_container,
             text="🂠 🂠",
-            font=("Segoe UI Emoji", 24),
+            font=("Segoe UI Emoji", 48),
             foreground="#006600"
         )
         self.hand_label.pack()
         self.hand_text_label = ttk.Label(
             hand_container,
             text="",
-            font=("Arial", 8),
+            font=("Arial", 10),
             foreground="#666666"
         )
         self.hand_text_label.pack()
@@ -93,14 +93,14 @@ class PokerOCRGui:
         self.flop_label = ttk.Label(
             flop_container,
             text="🂠 🂠 🂠",
-            font=("Segoe UI Emoji", 24),
+            font=("Segoe UI Emoji", 48),
             foreground="#006600"
         )
         self.flop_label.pack()
         self.flop_text_label = ttk.Label(
             flop_container,
             text="",
-            font=("Arial", 8),
+            font=("Arial", 10),
             foreground="#666666"
         )
         self.flop_text_label.pack()
@@ -114,14 +114,14 @@ class PokerOCRGui:
         self.turn_label = ttk.Label(
             turn_container,
             text="🂠",
-            font=("Segoe UI Emoji", 24),
+            font=("Segoe UI Emoji", 48),
             foreground="#006600"
         )
         self.turn_label.pack()
         self.turn_text_label = ttk.Label(
             turn_container,
             text="",
-            font=("Arial", 8),
+            font=("Arial", 10),
             foreground="#666666"
         )
         self.turn_text_label.pack()
@@ -135,14 +135,14 @@ class PokerOCRGui:
         self.river_label = ttk.Label(
             river_container,
             text="🂠",
-            font=("Segoe UI Emoji", 24),
+            font=("Segoe UI Emoji", 48),
             foreground="#006600"
         )
         self.river_label.pack()
         self.river_text_label = ttk.Label(
             river_container,
             text="",
-            font=("Arial", 8),
+            font=("Arial", 10),
             foreground="#666666"
         )
         self.river_text_label.pack()
