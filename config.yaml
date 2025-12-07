@@ -12,13 +12,13 @@ tesseract:
 # These coordinates define where cards appear in your poker client
 # Adjust these based on your screen resolution and poker client layout
 card_locations:
-  card1: [880, 770, 915, 810]    # Left hand card
-  card2: [945, 770, 985, 810]    # Right hand card
-  flop1: [592, 320, 652, 400]    # Flop card 1
-  flop2: [662, 320, 722, 400]    # Flop card 2
-  flop3: [732, 320, 792, 400]    # Flop card 3
-  turn:  [802, 320, 862, 400]    # Turn card
-  river: [872, 320, 932, 400]    # River card
+  card1: [880, 770, 920, 815]    # left hand
+  card2: [950, 765, 990, 810]    # right hand
+  flop1: [695, 425, 730, 470]
+  flop2: [810, 425, 840, 470]
+  flop3: [915, 425, 950, 470]
+  turn:  [1023, 425, 1060, 470]
+  river: [1130, 425, 1165, 470]
 
 # RGB color values for each suit (used for color-based suit detection)
 # Format: [R, G, B] where each value is 0-255

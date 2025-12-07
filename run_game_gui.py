@@ -15,7 +15,7 @@ class PokerOCRGui:
     def __init__(self):
         self.window = tk.Tk()
         self.window.title("Poker OCR Analyzer")
-        self.window.geometry("750x650")
+        self.window.geometry("750x1000")
         self.window.resizable(False, False)
 
         self.game = Game()
