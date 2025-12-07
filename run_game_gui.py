@@ -8,13 +8,14 @@ at different phases of the game.
 import tkinter as tk
 from tkinter import ttk, messagebox
 from src.game.game import Game
+from card_display import cards_to_unicode
 
 
 class PokerOCRGui:
     def __init__(self):
         self.window = tk.Tk()
         self.window.title("Poker OCR Analyzer")
-        self.window.geometry("600x450")
+        self.window.geometry("650x500")
         self.window.resizable(False, False)
 
         self.game = Game()
@@ -66,49 +67,85 @@ class PokerOCRGui:
         ttk.Label(cards_frame, text="Your Hand:", font=("Arial", 11, "bold")).grid(
             row=0, column=0, sticky=tk.W, pady=5
         )
+        hand_container = ttk.Frame(cards_frame)
+        hand_container.grid(row=0, column=1, sticky=tk.W, padx=10, pady=5)
         self.hand_label = ttk.Label(
-            cards_frame,
-            text="--",
-            font=("Courier New", 14),
+            hand_container,
+            text="🂠 🂠",
+            font=("Segoe UI Emoji", 24),
             foreground="#006600"
         )
-        self.hand_label.grid(row=0, column=1, sticky=tk.W, padx=10, pady=5)
+        self.hand_label.pack()
+        self.hand_text_label = ttk.Label(
+            hand_container,
+            text="",
+            font=("Arial", 8),
+            foreground="#666666"
+        )
+        self.hand_text_label.pack()
 
         # Flop cards
         ttk.Label(cards_frame, text="Flop:", font=("Arial", 11, "bold")).grid(
             row=1, column=0, sticky=tk.W, pady=5
         )
+        flop_container = ttk.Frame(cards_frame)
+        flop_container.grid(row=1, column=1, sticky=tk.W, padx=10, pady=5)
         self.flop_label = ttk.Label(
-            cards_frame,
-            text="--",
-            font=("Courier New", 14),
+            flop_container,
+            text="🂠 🂠 🂠",
+            font=("Segoe UI Emoji", 24),
             foreground="#006600"
         )
-        self.flop_label.grid(row=1, column=1, sticky=tk.W, padx=10, pady=5)
+        self.flop_label.pack()
+        self.flop_text_label = ttk.Label(
+            flop_container,
+            text="",
+            font=("Arial", 8),
+            foreground="#666666"
+        )
+        self.flop_text_label.pack()
 
         # Turn card
         ttk.Label(cards_frame, text="Turn:", font=("Arial", 11, "bold")).grid(
             row=2, column=0, sticky=tk.W, pady=5
         )
+        turn_container = ttk.Frame(cards_frame)
+        turn_container.grid(row=2, column=1, sticky=tk.W, padx=10, pady=5)
         self.turn_label = ttk.Label(
-            cards_frame,
-            text="--",
-            font=("Courier New", 14),
+            turn_container,
+            text="🂠",
+            font=("Segoe UI Emoji", 24),
             foreground="#006600"
         )
-        self.turn_label.grid(row=2, column=1, sticky=tk.W, padx=10, pady=5)
+        self.turn_label.pack()
+        self.turn_text_label = ttk.Label(
+            turn_container,
+            text="",
+            font=("Arial", 8),
+            foreground="#666666"
+        )
+        self.turn_text_label.pack()
 
         # River card
         ttk.Label(cards_frame, text="River:", font=("Arial", 11, "bold")).grid(
             row=3, column=0, sticky=tk.W, pady=5
         )
+        river_container = ttk.Frame(cards_frame)
+        river_container.grid(row=3, column=1, sticky=tk.W, padx=10, pady=5)
         self.river_label = ttk.Label(
-            cards_frame,
-            text="--",
-            font=("Courier New", 14),
+            river_container,
+            text="🂠",
+            font=("Segoe UI Emoji", 24),
             foreground="#006600"
         )
-        self.river_label.grid(row=3, column=1, sticky=tk.W, padx=10, pady=5)
+        self.river_label.pack()
+        self.river_text_label = ttk.Label(
+            river_container,
+            text="",
+            font=("Arial", 8),
+            foreground="#666666"
+        )
+        self.river_text_label.pack()
 
         # Status message
         self.status_label = ttk.Label(
@@ -164,11 +201,24 @@ class PokerOCRGui:
             self.status_label.config(text="All phases captured. Click Reset to start over.", foreground="#006600")
 
     def _update_display(self):
-        """Update the card display labels."""
-        self.hand_label.config(text=self.hand_cards if self.hand_cards else "--")
-        self.flop_label.config(text=self.flop_cards if self.flop_cards else "--")
-        self.turn_label.config(text=self.turn_card if self.turn_card else "--")
-        self.river_label.config(text=self.river_card if self.river_card else "--")
+        """Update the card display labels with Unicode symbols."""
+        # Convert card strings to Unicode symbols
+        hand_display = cards_to_unicode(self.hand_cards) if self.hand_cards else "🂠 🂠"
+        flop_display = cards_to_unicode(self.flop_cards) if self.flop_cards else "🂠 🂠 🂠"
+        turn_display = cards_to_unicode(self.turn_card) if self.turn_card else "🂠"
+        river_display = cards_to_unicode(self.river_card) if self.river_card else "🂠"
+
+        # Update card symbols
+        self.hand_label.config(text=hand_display)
+        self.flop_label.config(text=flop_display)
+        self.turn_label.config(text=turn_display)
+        self.river_label.config(text=river_display)
+
+        # Update text labels
+        self.hand_text_label.config(text=self.hand_cards if self.hand_cards else "")
+        self.flop_text_label.config(text=self.flop_cards if self.flop_cards else "")
+        self.turn_text_label.config(text=self.turn_card if self.turn_card else "")
+        self.river_text_label.config(text=self.river_card if self.river_card else "")
 
     def _capture_cards(self):
         """Capture cards for the current phase."""
