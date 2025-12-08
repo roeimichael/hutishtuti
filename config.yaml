@@ -6,7 +6,7 @@
 # Linux example: /usr/bin/tesseract
 # macOS example: /usr/local/bin/tesseract
 tesseract:
-  path: "C:\\Users\\roeym\\Desktop\\tesseract\\tesseract.exe"
+  path: "C:\\tesseract\\tesseract.exe"
 
 # Card locations on screen (left, top, right, bottom)
 # These coordinates define where cards appear in your poker client
