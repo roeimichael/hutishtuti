@@ -99,8 +99,8 @@ def preview_crop(image_path, card_name, coords, crop_dir="calibration_crops"):
     preview_path = os.path.join(crop_dir, f"{card_name}_preview_large.png")
     preview.save(preview_path)
 
-    print(f"\n✓ Preview saved to: {crop_path}")
-    print(f"✓ Large preview saved to: {preview_path}")
+    print(f"\n[OK] Preview saved to: {crop_path}")
+    print(f"[OK] Large preview saved to: {preview_path}")
     print(f"  Crop size: {crop.width}x{crop.height} pixels")
     print(f"  Coordinates: {coords}")
 
@@ -127,7 +127,7 @@ def create_annotated_screenshot(image_path, all_coords, output_path="calibration
         draw.text((coords[0], coords[1] - 20), card_name.upper(), fill=color)
 
     img.save(output_path)
-    print(f"\n✓ Annotated screenshot saved to: {output_path}")
+    print(f"\n[OK] Annotated screenshot saved to: {output_path}")
     print("  This shows all card positions marked on the original screenshot.")
 
 

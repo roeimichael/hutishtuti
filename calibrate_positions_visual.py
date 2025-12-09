@@ -69,7 +69,7 @@ class VisualCalibrator:
             # Draw rectangle on the plot
             self.draw_rectangle(coords)
 
-            print(f"\n✓ {self.current_card.upper()} position set: {coords}")
+            print(f"\n[OK] {self.current_card.upper()} position set: {coords}")
             print(f"  Size: {right-left}x{bottom-top} pixels")
 
             # Show preview
@@ -187,7 +187,7 @@ class VisualCalibrator:
         plt.title("All Card Positions", fontsize=14, fontweight='bold')
         annotated_path = "calibration_crops/annotated_screenshot.png"
         plt.savefig(annotated_path, dpi=150, bbox_inches='tight')
-        print(f"\n✓ Annotated screenshot saved to: {annotated_path}")
+        print(f"\n[OK] Annotated screenshot saved to: {annotated_path}")
 
         # Output YAML format
         print("\nAdd these coordinates to your config.yaml file:\n")
@@ -206,7 +206,7 @@ class VisualCalibrator:
                     coords = self.coords[card_name]
                     f.write(f"  {card_name}: [{coords[0]}, {coords[1]}, {coords[2]}, {coords[3]}]\n")
 
-        print(f"\n✓ Coordinates also saved to: {output_file}")
+        print(f"\n[OK] Coordinates also saved to: {output_file}")
         print("\nPress any key in the plot window to close...")
         plt.show()
 
@@ -261,7 +261,7 @@ def take_screenshot():
 
     screenshot = pyautogui.screenshot()
     screenshot.save(screenshot_path)
-    print(f"✓ Screenshot saved to: {screenshot_path}")
+    print(f"[OK] Screenshot saved to: {screenshot_path}")
 
     return screenshot_path
 
