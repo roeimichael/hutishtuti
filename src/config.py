@@ -30,7 +30,6 @@ class Config:
             # Search for config files in order of preference
             project_root = Path(__file__).parent.parent
             config_files = [
-                project_root / "config.local.yaml",  # User's local config (gitignored)
                 project_root / "config.yaml",         # Default config
             ]
 
@@ -83,7 +82,6 @@ class Config:
 
     @property
     def ocr_output_size(self) -> Tuple[int, int]:
-        """Get OCR output image size."""
         size = self._config.get('ocr', {}).get('output_size', [100, 100])
         return tuple(size)
 

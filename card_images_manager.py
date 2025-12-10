@@ -117,19 +117,3 @@ class CardImageManager:
 
         # API uses lowercase suit except for special cards
         return f"{rank}{suit}"
-
-    def preload_common_cards(self):
-        """Preload common card images for faster display."""
-        common_cards = [
-            "AS", "KS", "QS", "JS", "10S",
-            "AH", "KH", "QH", "JH", "10H",
-            "AD", "KD", "QD", "JD", "10D",
-            "AC", "KC", "QC", "JC", "10C",
-            "back"
-        ]
-
-        for card in common_cards:
-            try:
-                self.get_card_image(card)
-            except Exception as e:
-                print(f"Error preloading {card}: {e}")

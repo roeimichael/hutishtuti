@@ -7,7 +7,9 @@
 # macOS example: /usr/local/bin/tesseract
 tesseract:
   path: "C:\\tesseract\\tesseract.exe"
-
+cardsizes:
+  cardx: 100
+  cardy: 140
 # Card locations on screen (left, top, right, bottom)
 # These coordinates define where cards appear in your poker client
 # Adjust these based on your screen resolution and poker client layout

@@ -1,7 +1,6 @@
 from typing import List, Union
-from .player import MePlayer, EnemyPlayer, PlayerBase
+from .player import MePlayer, PlayerBase
 from .table import Table
-from .core.card import Card
 import os
 from datetime import datetime
 
@@ -44,19 +43,15 @@ class Game:
         return sum(1 for p in self.players if getattr(p, 'is_active', True))
 
     def update_me_relative_position(self):
-        # Find MePlayer
         me = next((p for p in self.players if p.__class__.__name__ == 'MePlayer'), None)
         if not me:
             return
-        # Get all active players in table order
         active_players = [p for p in self.players if getattr(p, 'is_active', True)]
         num_players = len(active_players)
         if num_players == 0:
             me.set_relative_position(None)
             return
-        # Find MePlayer's index among active players
         me_index = active_players.index(me)
-        # Relative position: how many act before me, starting after dealer
         rel_pos = (me_index - self.dealer_position) % num_players
         me.set_relative_position(rel_pos)
 
@@ -123,13 +118,6 @@ class Game:
         return f"Game State:\nBetting Round: {self.betting_round}\n{self.table}\nPlayers:\n{players_str}"
 
     def detect_hand_from_screen(self):
-        """
-        Takes a screenshot, saves it to the images folder, runs OCR based on betting round.
-        - Preflop: Detects player's hand cards
-        - Flop: Detects flop cards and player's hand
-        - Turn: Detects turn card
-        - River: Detects river card
-        """
         if pyautogui is None:
             print("pyautogui is not installed. Please install it to use screenshot functionality.")
             return
