@@ -1,3 +1,4 @@
+"""Player classes: PlayerBase (abstract), MePlayer (user), EnemyPlayer (opponents)."""
 from abc import ABC, abstractmethod
 from typing import List, Optional, Tuple
 from .core.card import Card
@@ -7,11 +8,11 @@ class PlayerBase(ABC):
         self.cards: List[Optional[Card]] = [None, None]
         self.stack = stack
         self.bet_amount = bet_amount
-        self.position = position  # think how to detrmine a 0 index --- dealer == zero index
+        self.position = position
         self.is_all_in = False
         self.is_active = True
         self.last_action: Optional[str] = None
-        self.history: List[Tuple[str, Optional[float]]] = []  # (action, amount)
+        self.history: List[Tuple[str, Optional[float]]] = []
 
     @abstractmethod
     def __str__(self):
@@ -37,7 +38,7 @@ class PlayerBase(ABC):
 class MePlayer(PlayerBase):
     def __init__(self, position: int, stack: float, bet_amount: float = 0.0):
         super().__init__(position, stack, bet_amount)
-        self.relative_position: Optional[int] = None  # How many players act before me
+        self.relative_position: Optional[int] = None
 
     def set_relative_position(self, rel_pos: int):
         self.relative_position = rel_pos
@@ -102,18 +103,7 @@ class EnemyPlayer(PlayerBase):
         elif not known:
             self.cards = [None, None]
 
-    def save_to_history(self):
-        # Returns a dict for later CSV export
-        return {
-            'player_id': self.player_id,
-            'position': self.position,
-            'stack': self.stack,
-            'bet_amount': self.bet_amount,
-            'cards': self.get_cards_str() if self.hand_known else 'Unknown',
-            'history': self.history
-        }
-
     def __str__(self):
         cards_str = self.get_cards_str() if self.hand_known else "Unknown"
         return (f"EnemyPlayer(id={self.player_id}, pos={self.position}, stack={self.stack}, bet={self.bet_amount}, "
-                f"cards={cards_str}, hand_known={self.hand_known}, last_action={self.last_action})") 
+                f"cards={cards_str}, hand_known={self.hand_known}, last_action={self.last_action})")

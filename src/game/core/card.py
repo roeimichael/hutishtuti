@@ -1,5 +1,8 @@
+"""Card, Suit, and Rank definitions for poker game."""
 from dataclasses import dataclass
 from enum import Enum
+
+RANK_ORDER = {'2': 2, '3': 3, '4': 4, '5': 5, '6': 6, '7': 7, '8': 8, '9': 9, '10': 10, 'J': 11, 'Q': 12, 'K': 13, 'A': 14}
 
 class Suit(Enum):
     HEARTS = "H"
@@ -36,14 +39,11 @@ class Card:
         return self.rank == other.rank and self.suit == other.suit
 
 def hand_str(card1: 'Card', card2: 'Card') -> str:
-    # Pocket pair
     if card1.rank == card2.rank:
         return f"{card1.rank.value}{card2.rank.value}"
-    # Suited
     elif card1.suit == card2.suit:
-        high, low = sorted([card1, card2], key=lambda c: c.rank.value, reverse=True)
+        high, low = sorted([card1, card2], key=lambda c: RANK_ORDER[c.rank.value], reverse=True)
         return f"{high.rank.value}{low.rank.value}s"
-    # Offsuit
     else:
-        high, low = sorted([card1, card2], key=lambda c: c.rank.value, reverse=True)
-        return f"{high.rank.value}{low.rank.value}O" 
+        high, low = sorted([card1, card2], key=lambda c: RANK_ORDER[c.rank.value], reverse=True)
+        return f"{high.rank.value}{low.rank.value}O"
