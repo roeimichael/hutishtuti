@@ -38,6 +38,9 @@ class Game:
         self.screenshots_dir = os.path.join(os.path.dirname(os.path.dirname(__file__)), '..', 'images')
         os.makedirs(self.screenshots_dir, exist_ok=True)
 
+    def set_betting_round(self, round_name: str):
+        return None
+
     def add_player(self, player_name: str, seat: int, stack: float = 0.0, is_hero: bool = False) -> bool:
         player = Player(player_name, seat, stack)
         player.is_hero = is_hero
